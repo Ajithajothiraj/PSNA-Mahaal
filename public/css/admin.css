@@ -1,0 +1,189 @@
+body {
+    background-color: #28a745; 
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-image: url('/images/contact bac.jpg'); 
+    background-size: cover;
+    background-position: center;
+}
+
+
+.container {
+    background-color: #ffffff; 
+    padding: 30px;
+    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    width: 320px; 
+    text-align: center;
+}
+
+
+.container h2 {
+    color: #28a745;
+    margin-bottom: 20px;
+}
+
+
+.container input[type="text"],
+.container input[type="email"],
+.container input[type="password"] {
+    width: calc(100% - 20px); 
+    padding: 12px; 
+    margin: 10px 0;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+
+.container button {
+    width: 100%;
+    padding: 12px;
+    background-color: #ffffff;
+    border: 2px solid #28a745; 
+    color: #28a745;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.container button:hover {
+    background-color: #28a745;
+    color: white; 
+}
+
+.container a {
+    display: block;
+    margin-top: 10px;
+    color: black;
+    text-decoration: none;
+}
+
+.container a:hover {
+    text-decoration: none;
+}
+
+
+span {
+    color: #28a745;
+}
+
+.login-container {
+    background-color: #ffffff; 
+    padding: 30px;
+    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    width: 350px;
+    text-align: center;
+}
+
+
+.login-container h2 {
+    color: #28a745;
+    margin-bottom: 20px;
+}
+
+
+.login-container input[type="text"],
+.login-container input[type="password"] {
+    width: calc(100% - 20px); 
+    padding: 12px;
+    margin: 10px 0; 
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+
+.login-container button {
+    width: 100%;
+    padding: 12px;
+    background-color: #ffffff;
+    border: 2px solid #28a745; 
+    color: #28a745;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+
+.login-container button:hover {
+    background-color: #28a745;
+    color: white;
+}
+
+
+.login-container label {
+    text-align: left;
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+
+.login-container label[for="otp"],
+.login-container label[for="newPassword"] {
+    margin-top: 15px;
+}
+
+
+.reset {
+    background-color: #ffffff; 
+    padding: 30px;
+    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    width: 350px;
+    text-align: center;
+}
+
+
+.reset h2 {
+    color: #28a745;
+    margin-bottom: 20px;
+}
+
+
+.reset input[type="password"] {
+    width: calc(100% - 20px); 
+    padding: 12px;
+    margin: 10px 0;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+
+.reset button {
+    width: 100%;
+    padding: 12px;
+    background-color: #ffffff;
+    border: 2px solid #28a745;
+    color: #28a745;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+
+.reset button:hover {
+    background-color: #28a745;
+    color: white;
+}
+
+
+.reset label {
+    text-align: left;
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+
+

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/modal.css">
+    <title>dashboard</title>
+</head>
+<body>
+    <div id="adminPopup" class="modal">
+        <div class="modal-content">
+            <h3>Admin Dashboard</h3>
+            <p>Select an option to proceed:</p>
+            <button id="bookingSection" class="btn-option">Booking</button>
+            <button id="enquirySection" class="btn-option">Enquiry</button>
+            <button id="businessAnalystSection" class="btn-option">Business Analyst</button>
+        </div>
+    </div>
+    <script>
+        window.onload = function() {
+            document.getElementById("adminPopup").style.display = "block"; 
+        };
+    
+    var bookingSectionButton = document.getElementById("bookingSection");
+    var enquirySectionButton = document.getElementById("enquirySection");
+    var businessAnalystSectionButton = document.getElementById("businessAnalystSection");
+
+    if (bookingSectionButton) {
+        bookingSectionButton.addEventListener("click", function() {
+            window.location.href = "/booking";
+        });
+    }
+
+    if (enquirySectionButton) {
+        enquirySectionButton.addEventListener("click", function() {
+            window.location.href = "/enquiry";
+        });
+    }
+
+    if (businessAnalystSectionButton) {
+        businessAnalystSectionButton.addEventListener("click", function() {
+            window.location.href = "/business-analyst";
+        });
+    }
+    window.onclick = function(event) {
+            const modal = document.getElementById("adminPopup");
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        };
+    </script>
+</body>
+</html>

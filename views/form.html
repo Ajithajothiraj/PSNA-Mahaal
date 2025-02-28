@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Registration Form</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <style>
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+    }
+
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: #f3f4f6;
+        margin: 0;
+        background-image: url('/images/contact bac.jpg'); 
+    background-size: cover;
+    background-position: center;
+    }
+
+    .container {
+        max-width: 400px;
+        width: 90%;
+        padding: 15px;
+        background-color: #ffffff;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        margin: 0;
+        height: 80vh; 
+        overflow-y: auto;
+    }
+
+    h2 {
+        text-align: center;
+        color: #333;
+        margin-bottom: 15px;
+        font-size: 20px;
+        font-weight: 600;
+    }
+
+    form {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    label {
+        color: #555;
+        font-weight: 500;
+        font-size: 13px;
+    }
+
+    input[type="text"],
+    input[type="date"],
+    select {
+        width: 100%;
+        padding: 8px;
+        margin-top: 3px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 13px;
+        color: #333;
+    }
+
+    input[type="text"]:focus,
+    input[type="date"]:focus,
+    select:focus {
+        border-color: #007bff;
+        outline: none;
+    }
+
+    input[type="submit"] {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        padding: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: bold;
+        transition: background-color 0.3s;
+    }
+
+    input[type="submit"]:hover {
+        background-color: #0056b3;
+    }
+    
+.submit-btn {
+    display: inline-block;
+    padding: 12px 25px;
+    font-size: 16px;
+    background-color: white;
+    color: black;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    border: 3px solid #ffcc00;
+}
+
+.submit-btn:hover {
+    background-color: #ffcc00;
+}
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>User Enquiry Form</h2>
+        <form id="userForm1" name="form1" action="/submit-form-admindb" method="POST">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+
+            <label for="phone">Phone Number:</label>
+            <input type="text" id="phone" name="phone" required>
+
+            <label for="address">Address:</label>
+            <input type="text" id="address" name="address" required>
+
+            <label for="event">Event Type:</label>
+            <select id="event" name="event">
+                <option value="marriage">Marriage</option>
+                <option value="engagement">Engagement</option>
+                <option value="birthday">Birthday</option>
+                <option value="party">Party</option>
+                <option value="others">Others</option>
+            </select>
+
+        
+
+            <div id="dateInputs"></div>
+
+
+            <label for="event_time">Event Time:</label>
+            <select id="event_time" name="event_time">
+                <option value="8am-3pm">8 AM - 3 PM</option>
+                <option value="4pm-10pm">4 PM - 10 PM</option>
+                <option value="full-day">Full Day</option>
+            </select>
+
+            <button type="submit" class="submit-btn" id="submit-btn">Submit and Send to Whatsapp</button>
+        </form>
+    </div>
+    <div id="whatsappLink"></div>
+   
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+    
+    
+    function form_validation() {
+        var name = document.getElementById("name").value.trim();
+        if (name.trim() === "") {
+            alert("Please enter your name");
+            document.form1.name.focus();
+            return false;
+        }
+
+        var phone = document.getElementById("phone").value.trim();
+        if (phone.length !== 10 || isNaN(phone)) {
+            alert("Please enter a valid 10-digit phone number");
+            document.form1.phone.focus();
+            return false;
+        }
+
+        var address = document.getElementById("address").value.trim();
+        if (address.trim() === "") {
+            alert("Please enter your address");
+            document.form1.address.focus();
+            return false;
+        }
+
+        return true;
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        
+        flatpickr("#event_date", { dateFormat: "Y-m-d" });
+        flatpickr("#date1", { dateFormat: "Y-m-d" });
+        flatpickr("#date2", { dateFormat: "Y-m-d" });
+        flatpickr("#date3", { dateFormat: "Y-m-d" });
+        flatpickr("#date4", { dateFormat: "Y-m-d" });
+
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+
+        
+        const dateInputsContainer = document.getElementById("dateInputs");
+
+
+        for (let i = 1; i <= 5; i++) {
+            const dateValue = urlParams.get(`date${i}`);
+            if (dateValue) {
+                const label = document.createElement("label");
+                label.textContent = `Date ${i}:`;
+
+                const input = document.createElement("input");
+                input.type = "text";
+                input.name = `dynamic_date${i}`;
+                input.value = dateValue;
+                input.readOnly = true;
+
+                dateInputsContainer.appendChild(label);
+                dateInputsContainer.appendChild(input);
+            }
+        }
+    });
+
+    document.getElementById("submit-btn").addEventListener("click", function (event) {
+        event.preventDefault(); 
+
+        if (!form_validation()) {
+            return; 
+        }
+
+        const name = document.getElementById("name").value.trim();
+        const phone = document.getElementById("phone").value.trim();
+        const address = document.getElementById("address").value.trim();
+        const eventType = document.getElementById("event").value.trim();
+        const eventTime = document.getElementById("event_time").value.trim();
+
+        let dynamicDates = [];
+        for (let i = 1; i <= 5; i++) {
+            const dynamicDate = document.querySelector(`input[name='dynamic_date${i}']`);
+            if (dynamicDate) {
+                dynamicDates.push(dynamicDate.value || null);
+            } else {
+                dynamicDates.push(null);
+            }
+        }
+
+        
+        const dataPayload = {
+            name,
+            phone,
+            address,
+            event: eventType,
+            event_time: eventTime,
+            dynamic_date1: dynamicDates[0],
+            dynamic_date2: dynamicDates[1],
+            dynamic_date3: dynamicDates[2],
+            dynamic_date4: dynamicDates[3],
+            dynamic_date5: dynamicDates[4],
+        };
+
+
+        fetch("/submit-form-admindb", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(dataPayload),
+        })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error("Failed to store data in the database.");
+                }
+                return response.text();
+            })
+            .then((result) => {
+                console.log("Data stored successfully:", result);
+
+                
+                let message = `*User Enquiry Details*\n\n`;
+                message += `Name: ${name}\n`;
+                message += `Phone: ${phone}\n`;
+                message += `Address: ${address}\n`;
+                message += `Event Type: ${eventType}\n`;
+                message += `Event Time: ${eventTime}\n`;
+
+                dynamicDates.forEach((date, index) => {
+                    if (date) {
+                        message += `Date ${index + 1}: ${date}\n`;
+                    }
+                });
+
+                
+                const whatsappNumber = "9626157410"; 
+                const encodedMessage = encodeURIComponent(message);
+                const whatsappLink = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+                window.open(whatsappLink, "_blank");
+            })
+            .catch((error) => {
+                console.error(error.message);
+                alert("Failed to store data. Please try again.");
+            });
+    });
+</script>
+
+
+    <script src="/css/enquiry.js"></script>
+</body>
+</html>

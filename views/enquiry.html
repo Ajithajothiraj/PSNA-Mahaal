@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Enquiry Chart</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <link rel="stylesheet" href="/css/chart.css"> 
+</head>
+<body>
+    <div class="chart-container">
+        <h2>Total Enquiries per Month</h2>
+        <canvas id="enquiryChart" width="400" height="200"></canvas>
+    </div>
+    <div class="excel" >
+        <button id="downloadExcelBtn">Download Excel</button>
+        </div>
+
+        <script>
+            document.getElementById('downloadExcelBtn').addEventListener('click', () => {
+            // Make a GET request to the backend to download the Excel file
+            fetch('/download-excel')
+                .then((response) => {
+                    if (!response.ok) throw new Error('Failed to download Excel file');
+                    return response.blob();
+                })
+                .then((blob) => {
+                    // Create a URL for the Blob and trigger the download
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.style.display = 'none';
+                    a.href = url;
+                    a.download = 'data.xlsx';
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url); // Clean up
+                })
+                .catch((error) => console.error('Error:', error));
+        });
+
+
+
+           fetch('/live-data1')
+    .then(response => response.json())
+    .then(data => {
+        // Sort data by year and month
+        const sortedData = data.sort((a, b) => {
+            const dateA = new Date(a.year, a.month - 1);
+            const dateB = new Date(b.year, b.month - 1);
+            return dateA - dateB;
+        });
+
+        // Create labels and dataset
+        const labels = sortedData.map(item => new Date(item.year, item.month - 1));
+        const totalEnquiries = sortedData.map(item => item.total_enquiries);
+
+        const ctx = document.getElementById('enquiryChart').getContext('2d');
+
+        // Create the bar chart
+        const chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Total Enquiries',
+                    data: totalEnquiries,
+                    backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1,
+                    barThickness: 20,
+                }]
+            },
+            options: {
+                scales: {
+                    x: {
+                        type: 'time',
+                        time: {
+                            unit: 'month',
+                        },
+                        ticks: {
+                            color: 'black'
+                        },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.1)'
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            color: 'black'
+                        },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.1)'
+                        }
+                    }
+                }
+            }
+        });
+    })
+    .catch(err => console.error('Error fetching live data:', err));
+
+
+    
+
+        </script>
+        
+    <script src="enquiry.js"></script>
+</body>
+</html>
