@@ -254,7 +254,7 @@ app.post('/send-message', async (req, res) => {
         
         const adminMailOptions = {
             from: email, 
-            to: 'kapilravi03@gmail.com', 
+            to: 'psnamahaaladmin@googlegroups.com', 
             subject: 'New Enquiry from PSNA Mahaal',
             text: text
         };
@@ -263,7 +263,7 @@ app.post('/send-message', async (req, res) => {
 
         
         const userMailOptions = {
-            from: 'kapilravi03@gmail.com', 
+            from: 'psnamahaaladmin@googlegroups.com', 
             to: email, 
             subject: 'Thank you for contacting PSNA Mahaal',
             text: `Dear ${name},\n\nThank you for reaching out to us. We have received your message and will get back to you soon.\n\nFor further information, please contact us at: \nPhone: 9626157410\n\nBest regards,\nPSNA Mahaal`
