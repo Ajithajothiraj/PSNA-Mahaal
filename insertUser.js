@@ -5,7 +5,7 @@ const bcrypt = require('bcrypt');
 const db = mysql.createConnection({
     host: 'localhost',
     user: 'root', 
-    password: 'Aishwarya_21', 
+    password: 'Kapil@1362005', 
     database: 'admindb'
 });
 
@@ -18,7 +18,7 @@ db.connect((err) => {
 
     
     const email = 'kapilravi03@gmail.com';
-    const password = 'Kapil@1762005';
+    const password = '123';
 
     
     bcrypt.hash(password, 10, (err, hash) => {

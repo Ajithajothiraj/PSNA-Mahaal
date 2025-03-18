@@ -282,7 +282,7 @@ app.post('/send-message', async (req, res) => {
 const db = mysql.createConnection({
     host: 'localhost',
     user: 'root', 
-    password: 'Aishwarya_21', 
+    password: 'Kapil@1362005', 
     database: 'admindb' 
 });
 
