@@ -690,6 +690,54 @@ app.get('/enquirys', (req, res) => {
 });
 
 
+app.get('/download-excel1', async (req, res) => {
+    try {
+
+        db.query('SELECT * FROM user', async (err, results) => {
+            if (err) throw err;
+
+            if (!results || results.length === 0) {
+                return res.status(404).send('No data found.');
+            }
+
+
+            const workbook = new ExcelJS.Workbook();
+            const worksheet = workbook.addWorksheet('Data');
+
+
+            const columns = Object.keys(results[0]).map((col) => ({
+                header: col,
+                key: col,
+
+                width: col.startsWith('date') ? 20 : 15,
+            }));
+            worksheet.columns = columns;
+
+
+            results.forEach((row) => worksheet.addRow(row));
+
+
+            ['event_date'].forEach((dateCol) => {
+                if (worksheet.getColumn(dateCol)) {
+                    worksheet.getColumn(dateCol).numFmt = 'mm/dd/yyyy'; 
+                }
+            });
+
+
+            res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            res.setHeader('Content-Disposition', 'attachment; filename=data.xlsx');
+
+            
+            await workbook.xlsx.write(res);
+            res.end();
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error generating Excel file');
+    }
+});
+
+
 app.listen(5000, () => {
     console.log('Server running on http://localhost:5000');
 }); 

@@ -20,19 +20,17 @@
 
         <script>
             document.getElementById('downloadExcelBtn').addEventListener('click', () => {
-            // Make a GET request to the backend to download the Excel file
             fetch('/download-excel')
                 .then((response) => {
                     if (!response.ok) throw new Error('Failed to download Excel file');
                     return response.blob();
                 })
                 .then((blob) => {
-                    // Create a URL for the Blob and trigger the download
                     const url = window.URL.createObjectURL(blob);
                     const a = document.createElement('a');
                     a.style.display = 'none';
                     a.href = url;
-                    a.download = 'data.xlsx';
+                    a.download = 'Enquiry.xlsx';
                     document.body.appendChild(a);
                     a.click();
                     window.URL.revokeObjectURL(url); // Clean up

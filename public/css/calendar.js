@@ -433,37 +433,21 @@ document.querySelectorAll('.calendar-day').forEach(day => {
 });
 
 
-
-
-
-/*document.getElementById('downloadExcelBtn').addEventListener('click', function() {
-    
-    const eventsArray = [];
-
-    
-    for (let dateKey in savedData) {
-        if (savedData.hasOwnProperty(dateKey)) {
-            savedData[dateKey].forEach(event => {
-                eventsArray.push({
-                    Date: event.event_date,
-                    Name: event.name,
-                    Phone: event.phone,
-                    Address: event.address,
-                    Time: event.event_time,
-                    Event: event.event
-                });
-            });
-        }
-    }
-
-   
-    const worksheet = XLSX.utils.json_to_sheet(eventsArray);
-
-    
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Calendar Events');
-
-    XLSX.writeFile(workbook, 'CalendarEvents.xlsx');
-});*/
-
-
+document.getElementById('downloadExcelBtn').addEventListener('click', () => {
+    fetch('/download-excel1')
+        .then((response) => {
+            if (!response.ok) throw new Error('Failed to download Excel file');
+            return response.blob();
+        })
+        .then((blob) => {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = 'Booking.xlsx';
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url); // Clean up
+        })
+        .catch((error) => console.error('Error:', error));
+});
