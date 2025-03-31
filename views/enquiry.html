@@ -50,7 +50,6 @@
             return dateA - dateB;
         });
 
-        // Create labels and dataset
         const labels = sortedData.map(item => new Date(item.year, item.month - 1));
         const totalEnquiries = sortedData.map(item => item.total_enquiries);
 

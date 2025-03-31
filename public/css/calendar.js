@@ -61,23 +61,45 @@ function showCalendar(month, year) {
                         cell.classList.add("booked-date");  
                         cell.onclick = () => displaySavedDetails(dateKey);
                         let eventDataList = bookedDays[dateKey];
-                        let tooltipText = eventDataList.map(event => 
-                            `Booked: ${event.name}, ${event.event_time}, ${event.phone}`
-                        ).join("\n");
+                        if (eventDataList.length > 1) {
+                            let tooltipText = '';
+                            for (let i = 0; i < Math.min(eventDataList.length, 2); i++) {
+                                let eventData = eventDataList[i];
+                                tooltipText += `Booked ${i+1}: ${eventData.name}, ${eventData.event_time}, ${eventData.phone}\n`;
+                            }
+                            cell.setAttribute('title', tooltipText.trim());
+                        } else {
+                            let eventData = eventDataList[0];
+                            cell.setAttribute('title', `Booked: ${eventData.name}, ${eventData.event_time}, ${eventData.phone}`);
+                        }
                     
-                        cell.setAttribute('title', tooltipText);  
-                        cell.onclick = () => displaySavedDetails(dateKey);  
+                          
                     } 
                     else {
                         cell.classList.add("disabled");
                         cell.setAttribute('title', 'Unavailable');
-                        cell.onclick = null;
                     }
                 }
-
+                if (bookedDays[dateKey]) {
+                    cell.classList.add("booked-date");
+                    let eventDataList = bookedDays[dateKey]; 
+                        if (eventDataList.length > 1) {
+                            let tooltipText = '';
+                            for (let i = 0; i < Math.min(eventDataList.length, 2); i++) {
+                                let eventData = eventDataList[i];
+                                tooltipText += `Booked ${i+1}: ${eventData.name}, ${eventData.event_time}, ${eventData.phone}\n`;
+                            }
+                            cell.setAttribute('title', tooltipText.trim());
+                        } else {
+                            let eventData = eventDataList[0];
+                            cell.setAttribute('title', `Booked: ${eventData.name}, ${eventData.event_time}, ${eventData.phone}`);
+                        }
+                } 
+                   
                 
                 
                 else {
+                    cell.classList.remove("booked-date");  
                     cell.classList.add("available-date");  // Optional: Style for available dates
                     cell.setAttribute('title', 'Available for booking');
                     cell.onclick = () => handleDateClick(dateKey);  // Show form for booking if available
@@ -125,7 +147,7 @@ function fetchEvents() {
     fetch('/get-events')
     .then(response => response.json())
     .then(events => {
-        console.log("📥 Raw Events Data from API:", events); // Debugging log
+        console.log("📥 Raw Events Data from API:", events); 
 
         if (!Array.isArray(events)) {
             console.error("❌ Expected an array, but got:", events);
@@ -431,6 +453,9 @@ document.querySelectorAll('.calendar-day').forEach(day => {
         displaySavedDetails(selectedDateKey);
     });
 });
+
+
+
 
 
 document.getElementById('downloadExcelBtn').addEventListener('click', () => {

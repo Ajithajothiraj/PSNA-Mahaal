@@ -411,26 +411,17 @@ app.post('/submit-form', (req, res) => {
     });
 });
 
-app.delete('/delete-event', (req, res) => {
-    const dateKey=req.query.event_date;
-    const phone = req.query.phone; 
-    console.log(`Received DELETE request for phone: ${phone},${dateKey}`);
-    
-    deleteEventFromDatabase(phone,dateKey)
-        .then((results) => {
-            console.log(`Event for phone: ${phone} deleted successfully.`);
-            
-            db.query('SELECT * FROM user', (err, events) => {
-                if (err) {
-                    return res.status(500).send('Error fetching updated events');
-                }
-                res.status(200).json(events);
-            });
-        })
-        .catch(err => {
-            console.error('Error deleting event:', err);
-            res.status(500).send('Error deleting event');
-        });
+app.delete('/delete-event/:id', (req, res) => {
+    const eventId = req.params.id;
+
+    db.query("DELETE FROM user WHERE id = ?", [eventId], (err, result) => {
+        if (err) {
+            console.error("Error deleting event:", err);
+            res.status(500).send("Error deleting event.");
+        } else {
+            res.status(200).send("Event deleted successfully.");
+        }
+    });
 });
 
 
