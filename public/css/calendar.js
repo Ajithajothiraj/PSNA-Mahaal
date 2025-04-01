@@ -45,7 +45,7 @@ function showCalendar(month, year) {
                 const formattedMonth = String(month + 1).padStart(2, '0');
                 const formattedDate = String(date).padStart(2, '0');
                 let dateKey = `${year}-${formattedMonth}-${formattedDate}`;
-                console.log('📅 Calendar dateKey:', dateKey);
+                
                 let currentDate = new Date(year, month, date);
 
                 if (currentDate.toDateString() === today.toDateString()) {
@@ -55,9 +55,7 @@ function showCalendar(month, year) {
                 if (currentDate < today) {
                     cell.classList.add("past-date");
                     if (bookedDays[dateKey]) {
-                        console.log(`📅 Found booked date in bookedDays: ${dateKey}`);  // ✅ Debugging log
-                        console.log('🔎 Checking cell:', cell);  // ✅ Log the cell element
-                    
+                       
                         cell.classList.add("booked-date");  
                         cell.onclick = () => displaySavedDetails(dateKey);
                         let eventDataList = bookedDays[dateKey];
@@ -148,10 +146,10 @@ function fetchEvents() {
     fetch('/get-events')
     .then(response => response.json())
     .then(events => {
-        console.log("📥 Raw Events Data from API:", events); 
+        
 
         if (!Array.isArray(events)) {
-            console.error("❌ Expected an array, but got:", events);
+            console.error(" Expected an array, but got:", events);
             return;
         }
 
@@ -159,13 +157,13 @@ function fetchEvents() {
             console.log(`🔍 Processing Event ${index + 1}:`, event);
 
             if (!event.event_date) {
-                console.error(`❌ Missing event_date in Event ${index + 1}:`, event);
+                console.error(` Missing event_date in Event ${index + 1}:`, event);
                 return;
             }
 
             let eventDateUTC = new Date(event.event_date); // Convert from UTC
             if (isNaN(eventDateUTC)) {
-                console.error(`❌ Invalid date format in Event ${index + 1}:`, event.event_date);
+                console.error(` Invalid date format in Event ${index + 1}:`, event.event_date);
                 return;
             }
 
@@ -173,17 +171,17 @@ function fetchEvents() {
             let eventDateLocal = new Date(eventDateUTC.getTime());
             let formattedDate = eventDateLocal.toLocaleDateString("en-CA"); // Format: YYYY-MM-DD
 
-            console.log("📆 Stored UTC Date:", eventDateUTC.toISOString());
-            console.log("✅ Adjusted Local Date for Display:", formattedDate);
+            console.log(" Stored UTC Date:", eventDateUTC.toISOString());
+            console.log(" Adjusted Local Date for Display:", formattedDate);
 
             // Modify event object with corrected local date
             event.event_date = formattedDate;
         });
-        showCalendar(currentMonth, currentYear); // 🛠️ Ensure the calendar is loaded first
+        showCalendar(currentMonth, currentYear); 
         updateUIWithEvents(events);
         displaySavedDetails(events); // 🔹 Pass the updated events array correctly
     })
-    .catch(error => console.error("❌ Error fetching events:", error));
+    .catch(error => console.error("Error fetching events:", error));
 }
 
 
@@ -209,18 +207,18 @@ function updateUIWithEvents(events) {
         });
     });
 
-    showCalendar(currentMonth, currentYear); // Refresh the calendar first!
+    showCalendar(currentMonth, currentYear); 
 
-    console.log("📌 Updated bookedDays:", bookedDays);
+    console.log("Updated bookedDays:", bookedDays);
 
     Object.keys(bookedDays).forEach(eventDateKey => {
         let cell = document.querySelector(`td[data-date="${eventDateKey}"]`);
         if (cell) {
-            console.log(`✅ Found cell for ${eventDateKey}`);
+            console.log(` Found cell for ${eventDateKey}`);
             cell.classList.add('booked-date');
             cell.setAttribute('title', `Booked: ${bookedDays[eventDateKey][0].name}, ${bookedDays[eventDateKey][0].event_time}`);
         } else {
-            console.warn(`⚠️ No cell found for date: ${eventDateKey}`);
+            console.warn(`No cell found for date: ${eventDateKey}`);
         }
     });
     
@@ -287,12 +285,6 @@ function displaySavedDetails(dateKey) {
 }
 
 
-
-
-
-
-
-// Close the form when clicking the close button
 document.getElementById("closeForm").onclick = function () {
     document.getElementById("eventModal").style.display = "none";
 };
@@ -353,48 +345,6 @@ function deleteEvent(dateKey,phoneNumber, eventIndex) {
 }
 
 
-
-    /*const eventToDelete = bookedDays[dateKey][eventIndex];
-    if (!bookedDays[dateKey] || !bookedDays[dateKey][eventIndex]) {
-        console.error("❌ Invalid dateKey or eventIndex:", dateKey, eventIndex);
-        return;
-    }
-
-    fetch(`/delete-event/${eventToDelete.id}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ date: dateKey, eventId: eventToDelete.id })
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log("Server Response:", data);
-        
-        if (data.success) {
-            console.log("✅ Event deleted successfully from database");
-
-            // Remove the deleted event from `bookedDays`
-            bookedDays[dateKey].splice(eventIndex, 1);
-
-            // If no more events on that date, remove the date from bookedDays
-            if (bookedDays[dateKey].length === 0) {
-                delete bookedDays[dateKey];  // Remove key from object
-            }
-
-            // Update the calendar UI immediately
-            updateCalendarUI();
-
-            // Update the modal view
-            displaySavedDetails(dateKey);
-        } else {
-            console.error(" Failed to delete event. Server Response:", data);
-        }
-    })
-    .catch(error => console.error("Error deleting event:", error));*/
-
-
-
-
-// Function to update the calendar after adding or deleting events
 function updateCalendar(dateKey) {
     const calendarElement = document.getElementById('calendar'); // Assuming you have a calendar container
     // Re-render your calendar to reflect the changes, or update the specific date's color
