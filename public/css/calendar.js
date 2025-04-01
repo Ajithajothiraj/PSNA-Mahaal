@@ -82,6 +82,7 @@ function showCalendar(month, year) {
                 }
                 if (bookedDays[dateKey]) {
                     cell.classList.add("booked-date");
+                    cell.onclick = () => displaySavedDetails(dateKey);
                     let eventDataList = bookedDays[dateKey]; 
                         if (eventDataList.length > 1) {
                             let tooltipText = '';
@@ -228,85 +229,67 @@ function updateUIWithEvents(events) {
 
 
 function displaySavedDetails(dateKey) {
-    const savedDetailsContainer = document.getElementById("savedDetails");
-    savedDetailsContainer.innerHTML = ""; 
-    if (!dateKey || !Array.isArray(dateKey)) {
-        console.error("❌ Invalid events data received:", dateKey);
+    const detailsDiv = document.getElementById('savedDetails'); 
+     let eventsData = bookedDays[dateKey];
+     if (!eventsData || eventsData.length === 0) {
+        detailsDiv.innerHTML = `<h3>No events for ${dateKey}</h3>`;
+        detailsDiv.style.display = 'block';
         return;
+     }
+     detailsDiv.innerHTML = `<h3>Details for ${dateKey}</h3>`;
+     let currentIndex = 0; 
+     function showNextEvent() {
+         
+        detailsDiv.innerHTML = `<h3>Details for ${dateKey}</h3>`;
+        if (currentIndex < eventsData.length) {
+            const eventData = eventsData[currentIndex];
+            detailsDiv.innerHTML += `
+                <div class="event-details">
+                    <p><strong>Name:</strong> ${eventData.name}</p>
+                    <p><strong>Phone:</strong> ${eventData.phone}</p>
+                    <p><strong>Address:</strong> ${eventData.address}</p>
+                    <p><strong>Time:</strong> ${eventData.event_time}</p>
+                    <p><strong>Date:</strong> ${eventData.event_date}</p>
+                    <p><strong>Event:</strong> ${eventData.event}</p>
+                    <button class="deleteEventBtn" data-index="${currentIndex}" data-phone="${eventData.phone}">Delete</button>
+                    <button class="addEventBtn">Add</button>
+                </div>
+            `;
+
+           
+            document.getElementById('detailsModal').style.display = 'block';
+            const deleteBtn = detailsDiv.querySelector('.deleteEventBtn');
+        deleteBtn.onclick = function() {
+            const phone = deleteBtn.getAttribute('data-phone'); 
+            const index = parseInt(deleteBtn.getAttribute('data-index')); 
+            deleteEvent(dateKey, phone, index); 
+        };
+        const addBtn = detailsDiv.querySelector('.addEventBtn');
+    addBtn.onclick = function() {
+            document.getElementById('detailsModal').style.display = 'none';  
+            document.getElementById('event_date').value = dateKey;  
+            document.getElementById('eventModal').style.display = 'block';  
+        };
+        
+            currentIndex++; 
+        } else {
+            detailsDiv.innerHTML += `<p>No more events to show.</p>`;
+        }
     }
-    dateKey.forEach((storedEvent,index) => {
-        if (!storedEvent.event_date) {
-            console.error(`❌ Event ${index + 1} is missing event_date:`, storedEvent);
-            return;
-        }
-        
-
-        // Convert stored event date to JS Date object
-        let eventDate = new Date(storedEvent.event_date + "T00:00:00");
-        if (isNaN(eventDate)) {
-            console.error(`❌ Invalid date format in Event ${index + 1}:`, storedEvent.event_date);
-            return;
-        }
-        
-       
-        let localDate = new Date(eventDate.getTime());
-
-        console.log(`📆 Stored UTC Date for Event ${index + 1}:`, eventDate.toISOString());
-        console.log(`✅ Adjusted Local Date for Display:`, localDate.toDateString());
-
-        // Display event details
-        const eventElement = document.createElement("div");
-        eventElement.innerHTML = `
-            <p><strong>Event:</strong> ${storedEvent.event}</p>
-            <p><strong>Date:</strong> ${localDate.toDateString()}</p>
-            <p><strong>Time:</strong> ${storedEvent.event_time}</p>
-            <p><strong>Location:</strong> ${storedEvent.address}</p>
-        `;
-        savedDetailsContainer.appendChild(eventElement);
-    });
-    // Ensure the Add Event button works
-    document.getElementById("addEventButton").onclick = function () {
-        showAddEventForm();
-    };
-
+        showNextEvent();
+    const nextEventButton = document.createElement('button');
+     nextEventButton.textContent = "Show Next Event";
+     nextEventButton.onclick = showNextEvent;
+     detailsDiv.appendChild(nextEventButton);
+     
+    
     document.getElementById("detailsModal").style.display = "block";
 }
 
 
 
-// Function to add an event
-function addEvent(dateKey, eventData) {
-    if (!bookedDays[dateKey]) {
-        bookedDays[dateKey] = [];
-    }
-    bookedDays[dateKey].push(eventData);
-    updateCalendar(dateKey); // Call this function to update the calendar view.
-}
 
-function showAddEventForm() {
-    // Capture the selected date from the input
-let selectedDate = document.getElementById("event_date").value;
 
-// Convert it to UTC to avoid timezone issues
-let correctedDate = new Date(selectedDate + "T00:00:00");
-
-// Convert it back to a format that your backend accepts
-let formattedDate = correctedDate.toISOString().split("T")[0]; 
-
-console.log("📅 Original Date:", selectedDate);
-console.log("✅ Corrected Date:", formattedDate);
-
-    if (!selectedDateKey) {
-        console.error("❌ No date selected for adding an event!");
-        return;
-    }
-
-    console.log("📅 Selected date for event:", selectedDateKey);
-    
-    // Ensure correct format before storing
-   
-    document.getElementById("eventModal").style.display = "block"; // Show form
-}
 
 
 // Close the form when clicking the close button
@@ -318,10 +301,66 @@ document.getElementById("closeForm").onclick = function () {
 document.getElementById("closeForm").onclick = function () {
     document.getElementById("eventModal").style.display = "none";
 };
-function deleteEvent(dateKey, eventIndex) {
-    const eventToDelete = bookedDays[dateKey][eventIndex];
 
-    fetch('/delete-event', {
+
+function deleteEvent(dateKey,phoneNumber, eventIndex) {
+    if (!dateKey ||!phoneNumber|| eventIndex === undefined) {
+        console.error('dateKey and event index are required for deletion.');
+        return;
+    }
+
+    if (bookedDays[dateKey]) {
+         
+        bookedDays[dateKey].splice(eventIndex, 1);
+        
+        
+        if (bookedDays[dateKey].length === 0) {
+            delete bookedDays[dateKey];
+        }
+        const detailsDiv = document.getElementById('savedDetails');
+        detailsDiv.innerHTML = ''; 
+        if (!bookedDays[dateKey] || bookedDays[dateKey].length === 0) {
+            detailsDiv.style.display = 'none'; 
+            
+            
+            const cell = document.querySelector(`td[data-date="${dateKey}"]`);
+            if (cell) {
+                cell.classList.remove('booked-date'); 
+                cell.onclick = () => handleDateClick(dateKey); 
+            }
+        } else {
+           
+            displaySavedDetails(dateKey);
+        }
+        fetch(`/delete-event?event_date=${encodeURIComponent(dateKey)}&phone=${encodeURIComponent(phoneNumber)}`, {
+            method: 'DELETE',
+        })
+        .then(response => {
+            if (response.ok) {
+                alert(`Successfully deleted event for ${dateKey}`);
+            } else {
+                throw new Error('Failed to delete event on the server.');
+            }
+        })
+        .catch(error => {
+            console.error('Error during deletion:', error);
+           
+        });
+    } else {
+        console.error('No events found for this date.');
+    }
+
+}
+
+
+
+    /*const eventToDelete = bookedDays[dateKey][eventIndex];
+    if (!bookedDays[dateKey] || !bookedDays[dateKey][eventIndex]) {
+        console.error("❌ Invalid dateKey or eventIndex:", dateKey, eventIndex);
+        return;
+    }
+
+    fetch(`/delete-event/${eventToDelete.id}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ date: dateKey, eventId: eventToDelete.id })
@@ -350,51 +389,10 @@ function deleteEvent(dateKey, eventIndex) {
             console.error(" Failed to delete event. Server Response:", data);
         }
     })
-    .catch(error => console.error("Error deleting event:", error));
-}
+    .catch(error => console.error("Error deleting event:", error));*/
 
 
-function showNextEvent(dateKey, currentIndex) {
-    const events = bookedDays[dateKey];
-    const nextIndex = currentIndex + 1;
 
-    if (!events || nextIndex >= events.length) {
-        alert("No more events for this date.");
-        return;
-    }
-
-    // Display the next event in a new modal
-    openEventModal(dateKey, nextIndex);
-}
-
-function openEventModal(dateKey, eventIndex) {
-    const detailsDiv = document.getElementById('savedDetails');
-    const event = bookedDays[dateKey][eventIndex];
-
-    if (!event) {
-        alert("No more events available.");
-        return;
-    }
-
-    detailsDiv.innerHTML = `
-        <h3>Event Details for ${dateKey}</h3>
-        <div class="event-details">
-            <p><strong>Name:</strong> ${event.name}</p>
-            <p><strong>Phone:</strong> ${event.phone}</p>
-            <p><strong>Time:</strong> ${event.event_time}</p>
-            <p><strong>Event:</strong> ${event.event}</p>
-            <p><strong>Address:</strong> ${event.address}</p>
-            <button class="delete-event" onclick="deleteEvent('${dateKey}', ${eventIndex})">Delete</button>
-            <button class="show-next" onclick="showNextEvent('${dateKey}', ${eventIndex})">Show Next Event</button>
-        </div>
-    `;
-
-    // Show modal
-    const modal = document.getElementById('detailsModal');
-    modal.style.display = 'block';
-    modal.style.visibility = 'visible';
-    modal.style.opacity = '1';
-}
 
 // Function to update the calendar after adding or deleting events
 function updateCalendar(dateKey) {
