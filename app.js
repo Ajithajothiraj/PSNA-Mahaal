@@ -75,47 +75,60 @@ app.get('/form.html', (req, res) => {
 });
 
 
+
+
 app.get('/download-excel', async (req, res) => {
     try {
+        
+        db.query(
+            `SELECT *, 
+            DATE_FORMAT(eventdate, '%Y-%m-%d') AS formatted_eventdate, 
+            DATE_FORMAT(date1, '%Y-%m-%d') AS formatted_date1, 
+            DATE_FORMAT(date2, '%Y-%m-%d') AS formatted_date2, 
+            DATE_FORMAT(date3, '%Y-%m-%d') AS formatted_date3, 
+            DATE_FORMAT(date4, '%Y-%m-%d') AS formatted_date4 
+            FROM enquirys`, 
+            async (err, results) => {
+                if (err) throw err;
 
-        db.query('SELECT * FROM enquirys', async (err, results) => {
-            if (err) throw err;
-
-            if (!results || results.length === 0) {
-                return res.status(404).send('No data found.');
-            }
-
-
-            const workbook = new ExcelJS.Workbook();
-            const worksheet = workbook.addWorksheet('Data');
-
-
-            const columns = Object.keys(results[0]).map((col) => ({
-                header: col,
-                key: col,
-
-                width: col.startsWith('date') ? 20 : 15,
-            }));
-            worksheet.columns = columns;
-
-
-            results.forEach((row) => worksheet.addRow(row));
-
-
-            ['eventdate','date1', 'date2', 'date3', 'date4'].forEach((dateCol) => {
-                if (worksheet.getColumn(dateCol)) {
-                    worksheet.getColumn(dateCol).numFmt = 'mm/dd/yyyy'; 
+                if (!results || results.length === 0) {
+                    return res.status(404).send('No data found.');
                 }
-            });
-
-
-            res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-            res.setHeader('Content-Disposition', 'attachment; filename=data.xlsx');
 
             
-            await workbook.xlsx.write(res);
-            res.end();
-        });
+                results.forEach(row => {
+                    if (row.eventdate) row.eventdate = row.formatted_eventdate;
+                    if (row.date1) row.date1 = row.formatted_date1;
+                    if (row.date2) row.date2 = row.formatted_date2;
+                    if (row.date3) row.date3 = row.formatted_date3;
+                    if (row.date4) row.date4 = row.formatted_date4;
+
+                    delete row.formatted_eventdate;
+                    delete row.formatted_date1;
+                    delete row.formatted_date2;
+                    delete row.formatted_date3;
+                    delete row.formatted_date4;
+                });
+
+                const workbook = new ExcelJS.Workbook();
+                const worksheet = workbook.addWorksheet('Enquiry Data');
+
+                const columns = Object.keys(results[0]).map(col => ({
+                    header: col,
+                    key: col,
+                    width: 20
+                }));
+                worksheet.columns = columns;
+                results.forEach(row => worksheet.addRow(row));
+
+                res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+                res.setHeader('Content-Disposition', 'attachment; filename=Enquiries.xlsx');
+
+                await workbook.xlsx.write(res);
+                res.end();
+                
+            }
+        );
     } catch (error) {
         console.error(error);
         res.status(500).send('Error generating Excel file');
@@ -690,52 +703,54 @@ app.get('/enquirys', (req, res) => {
 });
 
 
+
+
 app.get('/download-excel1', async (req, res) => {
     try {
-
-        db.query('SELECT * FROM user', async (err, results) => {
+        // Fetch dates as strings directly from MySQL to prevent timezone issues
+        db.query("SELECT *, DATE_FORMAT(event_date, '%Y-%m-%d') AS formatted_date FROM user", async (err, results) => {
             if (err) throw err;
 
             if (!results || results.length === 0) {
+                console.log('No data found.');
                 return res.status(404).send('No data found.');
             }
 
+            // Ensure we use the formatted date
+            results.forEach(row => {
+                row.event_date = row.formatted_date; // Use the formatted version
+                delete row.formatted_date; // Remove the extra column
+            });
 
             const workbook = new ExcelJS.Workbook();
             const worksheet = workbook.addWorksheet('Data');
 
-
-            const columns = Object.keys(results[0]).map((col) => ({
+            // Define columns dynamically
+            const columns = Object.keys(results[0]).map(col => ({
                 header: col,
                 key: col,
-
-                width: col.startsWith('date') ? 20 : 15,
+                width: 20
             }));
             worksheet.columns = columns;
 
+            // Add data rows
+            results.forEach(row => worksheet.addRow(row));
 
-            results.forEach((row) => worksheet.addRow(row));
-
-
-            ['event_date'].forEach((dateCol) => {
-                if (worksheet.getColumn(dateCol)) {
-                    worksheet.getColumn(dateCol).numFmt = 'mm/dd/yyyy'; 
-                }
-            });
-
-
+            // Set response headers
             res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-            res.setHeader('Content-Disposition', 'attachment; filename=data.xlsx');
+            res.setHeader('Content-Disposition', 'attachment; filename=Booking.xlsx');
 
-            
             await workbook.xlsx.write(res);
             res.end();
+            
         });
     } catch (error) {
         console.error(error);
         res.status(500).send('Error generating Excel file');
     }
 });
+
+
 
 
 app.listen(5000, () => {
